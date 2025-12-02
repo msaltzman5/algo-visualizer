@@ -92,6 +92,16 @@
     <main>
         <section id="controls">
             <h2>Controls</h2>
+            <div style="margin-bottom: 12px;">
+                <label for="node-count">Nodes:</label>
+                <input id="node-count" type="number" min="2" max="25" value="8" style="width:70px;">
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label>
+                    <input id="edge-weights" type="checkbox" checked>
+                    Include edge weights
+                </label>
+            </div>
             <button id="btn-generate">Generate Graph</button>
             <button id="btn-step">Step</button>
             <button id="btn-run">Run</button>
@@ -100,6 +110,24 @@
             <div style="margin-top: 16px;">
                 <h3>Status</h3>
                 <pre id="status">Ready.</pre>
+            </div>
+
+            <div id="stack-container" style="margin-top: 16px; display: none;">
+                <h3>Stack (DFS)</h3>
+                <table style="width: 100%; border-collapse: collapse; color: #e5e7eb;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Position (Top → Bottom)</th>
+                            <th style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Node</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stack-body">
+                        <tr>
+                            <td style="padding: 4px;">1</td>
+                            <td style="padding: 4px;">–</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 

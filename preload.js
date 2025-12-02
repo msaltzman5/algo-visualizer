@@ -6,5 +6,5 @@ const { contextBridge } = require("electron");
 // Example: expose a version API to your renderer (optional)
 contextBridge.exposeInMainWorld("appInfo", {
   name: "Algorithm Visualizer",
-  version: "0.1.0"
+  version: "1.0.0"
 });
