@@ -11,11 +11,12 @@ check software is installed
 ```npm -v```  
 ```git -v```  
 
-cd ~/Documents  
-mkdir algo-visualizer  
-cd algo-visualizer  
-git init  
-npm init -y  
+init repo
+```cd ~/Documents```  
+```mkdir algo-visualizer```  
+```cd algo-visualizer```  
+```git init```  
+```npm init -y```  
 
 ## Run:
 ```npm start```  
