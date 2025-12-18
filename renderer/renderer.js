@@ -25,8 +25,7 @@ const ALGORITHMS = {
     dfs: { id: "dfs", label: "Depth-First Search", edgeChance: 0.3, forceWeights: false },
     bfs: { id: "bfs", label: "Breadth-First Search", edgeChance: 0.35, forceWeights: false },
     dijkstra: { id: "dijkstra", label: "Dijkstra", edgeChance: 0.45, forceWeights: false },
-    prim: { id: "prim", label: "Prim (MST)", edgeChance: 0.4, forceWeights: true },
-    kruskal: { id: "kruskal", label: "Kruskal (MST)", edgeChance: 0.4, forceWeights: true }
+    prim: { id: "prim", label: "Prim (MST)", edgeChance: 0.4, forceWeights: true }
 };
 
 function getAlgorithmConfig(key) {
@@ -350,32 +349,6 @@ function updateWorklist() {
         return;
     }
 
-    if (algo.id === "kruskal") {
-        stackContainer.style.display = "block";
-        worklistTitle.textContent = "Edges (Kruskal order)";
-        col1.textContent = "Order (Next → Later)";
-        col2.textContent = "Edge";
-        col3.textContent = "Weight";
-        col3.style.display = "";
-
-        const remaining = traversalState.remainingEdges || [];
-        if (!remaining.length) {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td style="padding: 4px;">–</td><td style="padding: 4px;">Empty</td><td style="padding: 4px;">–</td>`;
-            worklistBody.appendChild(row);
-            return;
-        }
-
-        remaining.forEach((entry, idx) => {
-            const fromLabel = currentGraph?.getNode(entry.from)?.label ?? entry.from;
-            const toLabel = currentGraph?.getNode(entry.to)?.label ?? entry.to;
-            const row = document.createElement("tr");
-            row.innerHTML = `<td style="padding: 4px;">${idx + 1}</td><td style="padding: 4px;">${fromLabel} – ${toLabel}</td><td style="padding: 4px;">${entry.weight}</td>`;
-            worklistBody.appendChild(row);
-        });
-        return;
-    }
-
     if (algo.id === "dijkstra") {
         stackContainer.style.display = "block";
         worklistTitle.textContent = "Priority Queue (Dijkstra)";
@@ -633,28 +606,6 @@ function startPrimTraversal(graph) {
     drawGraph();
 }
 
-function startKruskalTraversal(graph) {
-    const edges = graph.edges
-        .map((e) => ({ ...e }))
-        .sort((a, b) => a.weight - b.weight);
-    const parent = new Map(graph.nodes.map((n) => [n.id, n.id]));
-    const rank = new Map(graph.nodes.map((n) => [n.id, 0]));
-
-    traversalState = {
-        type: "kruskal",
-        graph,
-        remainingEdges: edges,
-        parent,
-        rank,
-        edgesMST: new Set(),
-        edgesTraversed: new Set(),
-        finished: false
-    };
-    logStatus("Starting Kruskal; edges sorted by weight.");
-    updateWorklist();
-    drawGraph();
-}
-
 function stepDijkstra() {
     while (traversalState.queue.length > 0) {
         const node = traversalState.queue.shift();
@@ -691,7 +642,7 @@ function stepDijkstra() {
 
     traversalState.finished = true;
     traversalState.currentNode = null;
-    logStatus("Dijkstra complete. Shortest paths computed.");
+    logStatus("Dijkstra complete. Priority queue drained; all shortest paths settled.");
     updateWorklist();
     drawGraph();
 }
@@ -699,7 +650,7 @@ function stepDijkstra() {
 function stepPrim() {
     if (traversalState.queue.length === 0) {
         traversalState.finished = true;
-        logStatus("Prim complete. MST built.");
+        logStatus("Prim complete. Frontier empty or all nodes reached; MST finalized.");
         updateWorklist();
         drawGraph();
         return;
@@ -707,6 +658,9 @@ function stepPrim() {
 
     const edge = traversalState.queue.shift();
     if (traversalState.visited.has(edge.to)) {
+        const fromLabel = currentGraph.getNode(edge.from)?.label ?? edge.from;
+        const toLabel = currentGraph.getNode(edge.to)?.label ?? edge.to;
+        logStatus(`Discarded edge ${fromLabel}–${toLabel}; destination already part of MST.`);
         updateWorklist();
         drawGraph();
         return;
@@ -724,60 +678,7 @@ function stepPrim() {
 
     const fromLabel = currentGraph.getNode(edge.from)?.label ?? edge.from;
     const toLabel = currentGraph.getNode(edge.to)?.label ?? edge.to;
-    logStatus(`Added edge ${fromLabel}–${toLabel} (w=${edge.weight}) to MST.`);
-    updateWorklist();
-    drawGraph();
-}
-
-function findRoot(nodeId, parent) {
-    if (parent.get(nodeId) !== nodeId) {
-        parent.set(nodeId, findRoot(parent.get(nodeId), parent));
-    }
-    return parent.get(nodeId);
-}
-
-function unionSets(a, b, parent, rank) {
-    const rootA = findRoot(a, parent);
-    const rootB = findRoot(b, parent);
-    if (rootA === rootB) return false;
-
-    const rankA = rank.get(rootA);
-    const rankB = rank.get(rootB);
-    if (rankA < rankB) {
-        parent.set(rootA, rootB);
-    } else if (rankA > rankB) {
-        parent.set(rootB, rootA);
-    } else {
-        parent.set(rootB, rootA);
-        rank.set(rootA, rankA + 1);
-    }
-    return true;
-}
-
-function stepKruskal() {
-    if (traversalState.remainingEdges.length === 0 || traversalState.edgesMST.size >= currentGraph.nodes.length - 1) {
-        traversalState.finished = true;
-        logStatus("Kruskal complete. MST built or no more edges.");
-        updateWorklist();
-        drawGraph();
-        return;
-    }
-
-    const edge = traversalState.remainingEdges.shift();
-    const added = unionSets(edge.from, edge.to, traversalState.parent, traversalState.rank);
-    if (added) {
-        traversalState.edgesMST.add(canonicalEdgeKey(edge.from, edge.to));
-        traversalState.edgesTraversed.add(canonicalEdgeKey(edge.from, edge.to));
-        const fromLabel = currentGraph.getNode(edge.from)?.label ?? edge.from;
-        const toLabel = currentGraph.getNode(edge.to)?.label ?? edge.to;
-        logStatus(`Added edge ${fromLabel}–${toLabel} (w=${edge.weight}) to MST.`);
-    } else {
-        traversalState.edgesTraversed.add(canonicalEdgeKey(edge.from, edge.to));
-        const fromLabel = currentGraph.getNode(edge.from)?.label ?? edge.from;
-        const toLabel = currentGraph.getNode(edge.to)?.label ?? edge.to;
-        logStatus(`Skipped edge ${fromLabel}–${toLabel} (w=${edge.weight}) to avoid cycle.`);
-    }
-
+    logStatus(`Added edge ${fromLabel}–${toLabel} (w=${edge.weight}) as the lightest crossing edge to expand MST.`);
     updateWorklist();
     drawGraph();
 }
@@ -800,11 +701,6 @@ function startTraversal(algo, graph) {
 
     if (algo.id === "prim") {
         startPrimTraversal(graph);
-        return;
-    }
-
-    if (algo.id === "kruskal") {
-        startKruskalTraversal(graph);
         return;
     }
 
@@ -846,11 +742,6 @@ function stepTraversal() {
 
     if (traversalState.type === "prim") {
         stepPrim();
-        return;
-    }
-
-    if (traversalState.type === "kruskal") {
-        stepKruskal();
         return;
     }
 
