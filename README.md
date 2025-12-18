@@ -1,7 +1,7 @@
 # algo-visualizer
 
 ## On fresh machine:
-### Download nodejs and git
+### Download nodejs and git (according to your operating system)
 - https://nodejs.org/en/download
 - https://git-scm.com/install/
 ### Run these commands:
