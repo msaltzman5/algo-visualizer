@@ -1,25 +1,18 @@
 # algo-visualizer
 
-## Run on fresh machine:
+## On fresh machine:
+### Download nodejs and git
+- https://nodejs.org/en/download
+- https://git-scm.com/install/
+### Run these commands:
+- First:
+  - Open a terminal  
+  - Verify install  
+```node -v```  
+```npm -v```  
+```git -v```
+- If these succeed, proceed:
 ```git clone git@github.com:msaltzman5/algo-visualizer.git```  
 ```cd algo-visualizer```  
 ```npm install```  
 ```npm start```  
-
-## Setup to start development:
-```sudo apt update```  
-```sudo apt install -y git curl```  
-
-```sudo apt install -y nodejs npm```  
-
-check software is installed  
-```node -v```  
-```npm -v```  
-```git -v```  
-
-init repo
-```cd ~/Documents```  
-```mkdir algo-visualizer```  
-```cd algo-visualizer```  
-```git init```  
-```npm init -y```  
