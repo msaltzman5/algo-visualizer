@@ -2,6 +2,9 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
+// Disable hardware acceleration to avoid GPU-related buffer issues in some environments
+app.disableHardwareAcceleration();
+
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,

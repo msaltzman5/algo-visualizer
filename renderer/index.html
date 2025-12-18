@@ -32,7 +32,7 @@
         main {
             flex: 1;
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 0;
             min-height: 0;
         }
@@ -72,6 +72,11 @@
         button:hover {
             background: #1f2937;
         }
+
+        #status {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
     </style>
 </head>
 
@@ -83,7 +88,8 @@
                 <option value="dfs">Depth-First Search (DFS)</option>
                 <option value="bfs">Breadth-First Search (BFS)</option>
                 <option value="dijkstra">Dijkstra</option>
-                <option value="sort">Sorting</option>
+                <option value="prim">Prim (MST)</option>
+                <option value="kruskal">Kruskal (MST)</option>
             </select>
         </div>
         <span id="app-version"></span>
@@ -113,18 +119,20 @@
             </div>
 
             <div id="stack-container" style="margin-top: 16px; display: none;">
-                <h3>Stack (DFS)</h3>
+                <h3 id="worklist-title">Worklist</h3>
                 <table style="width: 100%; border-collapse: collapse; color: #e5e7eb;">
                     <thead>
                         <tr>
-                            <th style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Position (Top → Bottom)</th>
-                            <th style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Node</th>
+                            <th id="col-1" style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Position</th>
+                            <th id="col-2" style="text-align: left; border-bottom: 1px solid #334155; padding: 4px;">Node</th>
+                            <th id="col-3" style="text-align: left; border-bottom: 1px solid #334155; padding: 4px; display: none;">Distance</th>
                         </tr>
                     </thead>
-                    <tbody id="stack-body">
+                    <tbody id="worklist-body">
                         <tr>
                             <td style="padding: 4px;">1</td>
                             <td style="padding: 4px;">–</td>
+                            <td style="padding: 4px; display: none;">–</td>
                         </tr>
                     </tbody>
                 </table>
